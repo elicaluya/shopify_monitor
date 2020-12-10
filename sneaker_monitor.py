@@ -4,6 +4,7 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 
@@ -53,6 +54,25 @@ def buyProduct(url):
 	driver.find_element_by_xpath("//select[@id='checkout_shipping_address_province']/option[text()='California']").click()
 	driver.find_element_by_xpath("//input[@placeholder='ZIP code']").send_keys("94568")
 	driver.find_element_by_xpath("//input[@placeholder='Phone']").send_keys("1234567891")
+
+	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")))
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//span[@id='recaptcha-anchor']"))).click()
+	time.sleep(120)
+	driver.switch_to.default_content()
+
+	# driver.implicitly_wait(120)
+	# WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
+
+	# WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
+
+	curr_url = "step=payment_method"
+	if curr_url in driver.current_url:
+		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Card number']"))).send_keys("1234 5678 9101 1121")
+		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Name on card']"))).send_keys("Joe Mama")
+		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@id='expiry_year']"))).send_keys("1224")
+		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Security code']"))).send_keys("758")
+		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
+
 
 
 
