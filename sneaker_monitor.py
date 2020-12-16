@@ -7,17 +7,16 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 
 
 def availabilityCheck():
-	r = requests.get('https://shop-usa.palaceskateboards.com/products.json')
+	r = requests.get('https://shop-usa.palaceskateboards.com/products.json?limit=150')
 	products = json.loads((r.text))['products']
 
 	for product in products:
 		product_name = product['title']
-
 		if product_name == "P-FLAMES HOOD GREY MARL":
-			print("Found Item: " + product_name)
 			product_url = "https://shop-usa.palaceskateboards.com/products/" + product['handle']
 			return product_url
 	return False
@@ -33,7 +32,7 @@ def buyProduct(url):
 	driver.get(url)
 
 	# selecting item on product page
-	driver.find_element_by_xpath("//select/option[@value='32653913129053']").click()
+	driver.find_element_by_xpath("//select/option[@value='32653913096285']").click()
 	driver.find_element_by_xpath("//input[@class='add cart-btn clearfix']").click()
 	driver.implicitly_wait(10)
 	driver.find_element_by_xpath("//a[@class='cart-heading']").click()
@@ -57,27 +56,41 @@ def buyProduct(url):
 
 	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")))
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//span[@id='recaptcha-anchor']"))).click()
-	time.sleep(120)
+	wait = WebDriverWait(driver,120)
+
+	try:
+		wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'span[aria-checked="true"]')))
+	except TimeoutException:
+		print("Failed to solve captcha in time")
+	else:
+		print("Successfully completed captcha")
+		driver.switch_to.default_content()
+
+	
+	wait.until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
+
+	wait.until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
+
+
+	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[class='card-fields-iframe']")))
+
+	card_number = "1234567891011121"
+
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Card number']"))).send_keys(card_number)
+
+
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='name']"))).send_keys("Joe Mama")
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='expiry_year']"))).send_keys("1224")
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Security code']"))).send_keys("758")
+
 	driver.switch_to.default_content()
-
-	# driver.implicitly_wait(120)
-	# WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
-
-	# WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
-
-	curr_url = "step=payment_method"
-	if curr_url in driver.current_url:
-		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Card number']"))).send_keys("1234 5678 9101 1121")
-		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Name on card']"))).send_keys("Joe Mama")
-		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@id='expiry_year']"))).send_keys("1224")
-		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Security code']"))).send_keys("758")
-		WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
-
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@name='button']"))).click()
 
 
 
 myUrl = availabilityCheck()
 if myUrl != False:
+	print("Attempting to purchase product")
 	buyProduct(myUrl)
 else:
-	print("Not Available")
+	print("Product Not Available")
