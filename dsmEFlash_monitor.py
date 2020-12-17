@@ -11,13 +11,13 @@ from selenium.webdriver.common.keys import Keys
 
 
 def availabilityCheck(name):
-	r = requests.get('https://shop-usa.palaceskateboards.com/products.json?limit=150')
+	r = requests.get('https://eflash-us.doverstreetmarket.com/products.json?limit=150')
 	products = json.loads((r.text))['products']
 
 	for product in products:
 		product_name = product['title']
 		if name in product_name:
-			product_url = "https://shop-usa.palaceskateboards.com/products/" + product['handle']
+			product_url = "https://eflash-us.doverstreetmarket.com/products/" + product['handle']
 			return product_url
 	return False
 
@@ -34,18 +34,14 @@ def buyProduct(url, info, size):
 	# selecting item on product page
 	sizeString = "//select/option[text()='" + size + "']"
 	driver.find_element_by_xpath(sizeString).click()
-	driver.find_element_by_xpath("//input[@class='add cart-btn clearfix']").click()
-	driver.implicitly_wait(10)
-	driver.find_element_by_xpath("//a[@class='cart-heading']").click()
+	driver.find_element_by_xpath("//button[@class='btn product-form__cart-submit']").click()
 
 	# On cart page
-	checkbox = driver.find_element_by_xpath("//input[@class='checkbox-input']")
-	driver.execute_script("arguments[0].click();", checkbox)
-	driver.find_element_by_xpath("//input[@class='shopping-btn']").click()
+	driver.find_element_by_xpath("//input[@class='btn btn--small-wide']").click()
 
 	# On checkout page
 	driver.find_element_by_xpath("//input[@placeholder='Email']").send_keys(info['personal']['email'])
-	driver.find_element_by_xpath("//input[@placeholder='First name']").send_keys(info['personal']['firstName'])
+	driver.find_element_by_xpath("//input[@placeholder='First name (optional)']").send_keys(info['personal']['firstName'])
 	driver.find_element_by_xpath("//input[@placeholder='Last name']").send_keys(info['personal']['lastName'])
 	driver.find_element_by_xpath("//input[@placeholder='Address']").send_keys(info['address']['street'])
 	driver.find_element_by_xpath("//input[@placeholder='Apartment, suite, etc. (optional)']").send_keys(info['address']['address2'])
@@ -99,18 +95,19 @@ def buyProduct(url, info, size):
 
 	# Submit order
 	driver.switch_to.default_content()
-	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@name='button']"))).click()
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@id='continue_button']"))).click()
+
 
 
 with open('info/product_info.json') as product_json:
 	product_info = json.load(product_json)
 
+with open('info/user_info.json') as user_json:
+	user_info = json.load(user_json)
 
 pName = product_info['product_name']
 pSize = product_info['size']
 
-with open('info/user_info.json') as user_json:
-	user_info = json.load(user_json)
 
 myUrl = availabilityCheck(pName)
 while True:

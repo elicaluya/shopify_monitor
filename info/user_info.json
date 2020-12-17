@@ -1,0 +1,28 @@
+{
+	"personal":{
+		"email": "example@gmail.com",
+		"firstName": "Joe",
+		"lastName": "Mama",
+		"phone": "1234567891"
+	},
+	"address": {
+		"street": "123 First St.",
+		"address2": "Apt. A",
+		"city": "Dublin",
+		"country": "United States",
+		"state": "California",
+		"zip": "94568"
+	},
+	
+	"payment": {
+		"name": "Joe Mama",
+		"card1": "1234",
+		"card2": "1234",
+		"card3": "1234",
+		"card4": "1234",
+		"exMonth": "12",
+		"exYear": "34",
+		"vCode": "123"
+	}
+
+}
