@@ -54,10 +54,12 @@ def buyProduct(url):
 	driver.find_element_by_xpath("//input[@placeholder='ZIP code']").send_keys("94568")
 	driver.find_element_by_xpath("//input[@placeholder='Phone']").send_keys("1234567891")
 
+	# Switch to Captcha iframe
 	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")))
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//span[@id='recaptcha-anchor']"))).click()
 	wait = WebDriverWait(driver,120)
 
+	# Wait until captcha is solved before moving forward
 	try:
 		wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'span[aria-checked="true"]')))
 	except TimeoutException:
@@ -71,18 +73,27 @@ def buyProduct(url):
 
 	wait.until(EC.presence_of_element_located((By.XPATH, "//button[@name='button']"))).click()
 
+	# Switch to individual iframes for each section and fill out info
+	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[id^='card-fields-number-']")))
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='number']"))).send_keys("1234")
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='number']"))).send_keys("1234")
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='number']"))).send_keys("1234")
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='number']"))).send_keys("1234")
 
-	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[class='card-fields-iframe']")))
-
-	card_number = "1234567891011121"
-
-	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Card number']"))).send_keys(card_number)
-
-
+	driver.switch_to.default_content()
+	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[id^='card-fields-name-']")))
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='name']"))).send_keys("Joe Mama")
-	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='expiry_year']"))).send_keys("1224")
-	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Security code']"))).send_keys("758")
 
+	driver.switch_to.default_content()
+	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[id^='card-fields-expiry-']")))
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='expiry']"))).send_keys("12")
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='expiry']"))).send_keys("34")
+
+	driver.switch_to.default_content()
+	WebDriverWait(driver, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[id^='card-fields-verification_value-']")))
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='verification_value']"))).send_keys("123")
+
+	# Submit order
 	driver.switch_to.default_content()
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@name='button']"))).click()
 
