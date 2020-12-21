@@ -113,11 +113,17 @@ with open('info/user_info.json') as user_json:
 	user_info = json.load(user_json)
 
 myUrl = availabilityCheck(pName)
+myUrlCapital = availabilityCheck(pName.upper())
 while True:
-	if myUrl != False:
-		print("Attempting to purchase product")
-		buyProduct(myUrl, user_info, pSize)
-		break
+	if myUrl != False or myUrlCapital != False:
+		if myUrl != False:
+			print("Attempting to purchase product")
+			buyProduct(myUrl, user_info, pSize)
+			break
+		elif myUrlCapital != False:
+			print("Attempting to purchase product")
+			buyProduct(myUrlCapital, user_info, pSize)
+			break
 	else:
 		print("Product Not Available")
 		time.sleep(4)

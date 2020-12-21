@@ -99,22 +99,29 @@ def buyProduct(url, info, size):
 
 
 
-with open('info/product_info.json') as product_json:
-	product_info = json.load(product_json)
+def runDSMEFlashMonitor():
+	with open('info/product_info.json') as product_json:
+		product_info = json.load(product_json)
 
-with open('info/user_info.json') as user_json:
-	user_info = json.load(user_json)
+	with open('info/user_info.json') as user_json:
+		user_info = json.load(user_json)
 
-pName = product_info['product_name']
-pSize = product_info['size']
+	pName = product_info['product_name']
+	pSize = product_info['size']
 
 
-myUrl = availabilityCheck(pName)
-while True:
-	if myUrl != False:
-		print("Attempting to purchase product")
-		buyProduct(myUrl, user_info, pSize)
-		break
-	else:
-		print("Product Not Available")
-		time.sleep(4)
+	myUrl = availabilityCheck(pName)
+	myUrlCapital = availabilityCheck(pName.upper())
+	while True:
+		if myUrl != False or myUrlCapital != False:
+			if myUrl != False:
+				print("Attempting to purchase product")
+				buyProduct(myUrl, user_info, pSize)
+				break
+			elif myUrlCapital != False:
+				print("Attempting to purchase product")
+				buyProduct(myUrlCapital, user_info, pSize)
+				break
+		else:
+			print("Product Not Available")
+			time.sleep(4)
